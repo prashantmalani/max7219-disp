@@ -44,16 +44,45 @@ class Max7219:
 
         # Write the data
         GPIO.output(CS_BAR, GPIO.LOW)
+        #time.sleep(0.002)
         for cur_bit in write_data:
+            #time.sleep(0.002)
             GPIO.output(CLK, 0)
-            GPIO.output(DIN, cur_bit)
+            #time.sleep(0.002)
+            GPIO.output(DIN, cur_bit == 1)
+            print "Bit written is " + str(cur_bit)
+            #time.sleep(0.002)
             GPIO.output(CLK, 1)
+        GPIO.output(CLK, 0)
+        time.sleep(0.002)
+        GPIO.output(CLK, 1)
         GPIO.output(CS_BAR, GPIO.HIGH)
+        time.sleep(0.002)
         print "Done all the GPIO stuff..."
+
+    def expData(self, address):
+        """ Write all bits to 1 individually.
+        """
+        val = 1;
+        for i in range(0, 8):
+            self.writeData(address, val)
+            time.sleep(2)
+            val = (val << 1) | 1
+
+    def WaitClk(self, duration):
+        """ Since we need the clock running all the time, even when
+        aren't writing data to it, we need to keep toggling the data when
+        nothing is running, at least for now.
+        """
+        stop = time.time() + duration
+        while time.time() < stop:
+            GPIO.output(CLK, 0)
+            GPIO.output(CLK, 1)
 
 if __name__ == "__main__":
     max_drv = Max7219()
     max_drv.initialize()
-    max_drv.writeData(0xF, 0xFF)
+    #max_drv.expData(0x1)
+    max_drv.writeData(0x1,0x99)
     GPIO.cleanup()
 
