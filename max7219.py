@@ -20,94 +20,40 @@ DIN = 17
 CS_BAR = 22
 CLK = 23
 
-GPIO.setmode(GPIO.BCM)
+class Max7219:
+    """ Max7219 initial drive.
+    """
+    def initialize(self):
+        """ Set up GPIO pins.
+        """
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(DIN, GPIO.OUT)
+        GPIO.setup(CS_BAR, GPIO.OUT)
+        GPIO.setup(CLK, GPIO.OUT)
 
-GPIO.setup(DIN, GPIO.OUT)
-GPIO.setup(CS_BAR, GPIO.OUT)
-GPIO.setup(CLK, GPIO.OUT)
+    def writeData(self, address, data):
+        """ Write data to the defined address. Assumed that both data and
+        address are in hex format.
+        Address is assumed to be 4 bits wide, and data 8 bits wide.
+        """
+        address = address | 0xF0
+        # Convert to array
+        addr_list = [int(x) for x in bin(address)[2:]]
+        data_list = [int(x) for x in bin(data)[2:]]
+        write_data = addr_list + data_list
 
+        # Write the data
+        GPIO.output(CS_BAR, GPIO.LOW)
+        for cur_bit in write_data:
+            GPIO.output(CLK, 0)
+            GPIO.output(DIN, cur_bit)
+            GPIO.output(CLK, 1)
+        GPIO.output(CS_BAR, GPIO.HIGH)
+        print "Done all the GPIO stuff..."
 
-GPIO.output(CS_BAR, GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(DIN, GPIO.HIGH)
-time.sleep(0.002)
-
-# First 4 bits don't care
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-
-# 0xF address
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-
-#D7-D1 don't care, D0=1
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.LOW)
-time.sleep(0.002)
-GPIO.output(CLK,GPIO.HIGH)
-time.sleep(0.002)
-
-GPIO.output(CS_BAR, GPIO.HIGH)
-
-print "Done all the GPIO stuff..."
-
-time.sleep(5)
-
-
-GPIO.cleanup()
+if __name__ == "__main__":
+    max_drv = Max7219()
+    max_drv.initialize()
+    max_drv.writeData(0xF, 0xFF)
+    GPIO.cleanup()
 
