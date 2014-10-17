@@ -64,7 +64,8 @@ class Max7219:
         """ Write the contents of a screen out to the appropriate addresses.
         The data is expected as a array of 8 8 bit entries, arranged so:
         [row0, row1, row2, row3, .... row7]. We write the extra 9th "No-op"
-        register since it's needed to flush out the last row."""
+        register since it's needed to flush out the last row.
+        """
         row_addr = 0x1
         for row_data in data:
             self.writeData(row_addr, row_data)
