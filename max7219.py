@@ -49,33 +49,28 @@ class Max7219:
         # Convert to array
         addr_list = [int(x) for x in bin(address)[3:]]
         data_list = [int(x) for x in bin(data)[3:]]
-        print data_list
+        # NOTE: Data optionally reversed here, depending on orientation.
         write_data = addr_list + data_list
 
         # Write the data
         GPIO.output(CS, GPIO.HIGH)
-        #time.sleep(0.002)
         for cur_bit in write_data:
             GPIO.output(DIN, cur_bit == 1)
-            #time.sleep(0.002)
             GPIO.output(CLK, 1)
-            #time.sleep(0.002)
-            print "Bit written is " + str(cur_bit)
-            #time.sleep(0.002)
             GPIO.output(CLK, 0)
-        # The clock edge needs to rise, and only then should the CS
-        # signal be raised.
         GPIO.output(CS, GPIO.LOW)
-        print "Done all the GPIO stuff..."
 
-    def expData(self, address):
-        """ Write all bits to 1 individually.
-        """
-        val = 1;
-        for i in range(0, 8):
-            self.writeData(address, val)
-            time.sleep(2)
-            val = (val << 1) | 1
+    def writeScreen(self, data):
+        """ Write the contents of a screen out to the appropriate addresses.
+        The data is expected as a array of 8 8 bit entries, arranged so:
+        [row0, row1, row2, row3, .... row7]. We write the extra 9th "No-op"
+        register since it's needed to flush out the last row."""
+        row_addr = 0x1
+        for row_data in data:
+            self.writeData(row_addr, row_data)
+            row_addr += 1
+        self.writeData(row_addr, 0)
+
 
     def cleanUp(self):
         self.writeData(0xC, 0x0)
@@ -85,14 +80,11 @@ class Max7219:
 if __name__ == "__main__":
     max_drv = Max7219()
     max_drv.initialize()
-    max_drv.writeData(0x1, 0x1)
-    max_drv.writeData(0x2, 0x3)
-    max_drv.writeData(0x3, 0x7)
-    max_drv.writeData(0x4, 0xF)
-    max_drv.writeData(0x5, 0x1F)
-    max_drv.writeData(0x6, 0x3F)
-    max_drv.writeData(0x7, 0x7F)
-    max_drv.writeData(0x8, 0xFF)
+    test1 = [0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF]
+    max_drv.writeScreen(test1)
+    time.sleep(3);
+    test2 = [0x18, 0x3C, 0x7E, 0xFF, 0xFF, 0x7E, 0x3C, 0x18]
+    max_drv.writeScreen(test2)
     time.sleep(3);
     max_drv.cleanUp()
 
