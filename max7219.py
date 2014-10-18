@@ -1,5 +1,3 @@
-#
-#
 # MAX7219 Driver for displaying text
 #
 # Author : Prashant Malani <p.malani@gmail.com>
@@ -14,6 +12,8 @@
 #
 import RPi.GPIO as GPIO
 import time
+
+import dictionary as ltrs
 
 # Local defines (GPIO mappings)
 DIN = 17
@@ -83,9 +83,12 @@ if __name__ == "__main__":
     max_drv.initialize()
     test1 = [0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF]
     max_drv.writeScreen(test1)
-    time.sleep(3);
+    time.sleep(1);
     test2 = [0x18, 0x3C, 0x7E, 0xFF, 0xFF, 0x7E, 0x3C, 0x18]
     max_drv.writeScreen(test2)
-    time.sleep(3);
+    time.sleep(1);
+    for values in ltrs.char_map.itervalues():
+        max_drv.writeScreen(values)
+        time.sleep(1);
     max_drv.cleanUp()
 
