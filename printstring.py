@@ -9,10 +9,12 @@
 import max7219
 import dictionary as ltrs
 import time
+import sys
 
 
 if __name__ == "__main__":
-    sample_str = "lBEllED"
+    sample_str = sys.argv[1]
+    print sample_str
     max_drv = max7219.Max7219()
     max_drv.initialize()
     max_drv.writeString(sample_str)
