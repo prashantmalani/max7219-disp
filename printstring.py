@@ -12,10 +12,10 @@ import time
 
 
 if __name__ == "__main__":
-    sample_str = "BAD BACKED"
+    sample_str = "lBEllED"
     max_drv = max7219.Max7219()
     max_drv.initialize()
-    max_drv.writeString("BAD BACKED")
+    max_drv.writeString(sample_str)
     max_drv.cleanUp()
 
 

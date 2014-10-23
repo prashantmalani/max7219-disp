@@ -80,11 +80,12 @@ class Max7219:
         time.sleep(2)
         for cur_char in string[1:]:
             cur_data = ltrs.char_map[cur_char][:]
+            cur_width = ltrs.char_width[cur_char]
             # Run the inner loop 8 times to get through all 8 columns
-            for i in range(0, 8):
+            for i in range(0, cur_width):
                 # Left shift each row, and then update it
                 for i in range(0, 8):
-                    new_bit = (cur_data[i] >> 7) & 1
+                    new_bit = (cur_data[i] >> (cur_width - 1)) & 1
                     screen_data[i] = ((screen_data[i] << 1) | new_bit) & 0xFF
                     cur_data[i] = (cur_data[i] << 1) & 0xFF
                 self.writeScreen(screen_data)
